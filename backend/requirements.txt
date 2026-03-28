@@ -1,0 +1,11 @@
+fastapi==0.115.0
+uvicorn[standard]==0.30.0
+sqlalchemy==2.0.48
+psycopg2-binary==2.9.11
+pydantic-settings==2.5.2
+google-generativeai==0.8.3
+africastalking==1.2.7
+python-multipart==0.0.12
+google-cloud-translate==3.25.0
+python-dotenv==1.2.2
+requests==2.33.0
