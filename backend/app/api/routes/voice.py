@@ -3,9 +3,10 @@ from fastapi import APIRouter, Form, Depends
 from fastapi.responses import PlainTextResponse
 from sqlalchemy.orm import Session
 from app.core.database import get_db
+from app.core.config import settings
 from app.models.case import Case, InputMode
 from app.services.ai_service import run_triage
-from app.services.sms_service import send_sms
+from app.services.email_service import send_email
 from app.services.hospital_service import find_nearest_hospital, alert_hospital
 
 router = APIRouter(prefix="/voice", tags=["voice"])
@@ -27,10 +28,13 @@ async def voice_webhook(
     symptoms_text = transcription.strip()
 
     if not symptoms_text:
-        send_sms(
-            callerNumber, "none", "normal",
-            "We could not hear your symptoms clearly. Please call again or visit remotriage.app to type your symptoms."
-        )
+        recipient = settings.hospital_alert_emails[0] if settings.hospital_alert_emails else ""
+        if recipient:
+            send_email(
+                recipient,
+                "VOICE TRIAGE: Unclear transcription",
+                f"Caller {callerNumber} had unclear voice symptoms. Please advise callback or app-based triage.",
+            )
         return "OK"
 
     result = await run_triage(symptoms_text)
@@ -60,8 +64,25 @@ async def voice_webhook(
     if hospital_name:
         hospital = find_nearest_hospital(None)
         if hospital:
-            alert_hospital(hospital, case.id, result.get("symptoms_detected", []), result["recommendation"])
+            alert_hospital(
+                hospital,
+                case.id,
+                result.get("symptoms_detected", []),
+                result["recommendation"],
+                patient_location=case.location,
+            )
 
-    send_sms(callerNumber, case.id, result["severity"], result["recommendation"])
+    recipient = settings.hospital_alert_emails[0] if settings.hospital_alert_emails else ""
+    if recipient:
+        send_email(
+            recipient,
+            f"VOICE TRIAGE RESULT - Case {str(case.id)[:8].upper()}",
+            (
+                f"Caller: {callerNumber}\n"
+                f"Severity: {result['severity']}\n"
+                f"Recommendation: {result['recommendation']}\n"
+                f"Case ID: {case.id}"
+            ),
+        )
 
     return "OK"

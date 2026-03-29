@@ -52,7 +52,7 @@ export default function HeroSection() {
           className="hero-collage">
           <div style={{ position:'absolute', right:'5%', top:'5%', bottom:'5%',
             width:'55%', borderRadius:'var(--r-xl)', overflow:'hidden', boxShadow:'var(--shadow-xl)' }}>
-            <img src="https://images.unsplash.com/photo-1631217868264-e5b90bb7e133?w=600&q=80"
+            <img src="https://images.unsplash.com/photo-1666887360726-f55472d96c34?q=600&q=80"
               alt="" style={{ width:'100%', height:'100%', objectFit:'cover' }} />
           </div>
           <div style={{ position:'absolute', left:0, top:'6%', width:'42%', height:'48%',

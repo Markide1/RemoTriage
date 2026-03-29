@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.database import Base, engine
-from app.api.routes import triage, prognosis, voice
+from app.api.routes import triage, prognosis, voice, alerts
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
@@ -20,6 +20,7 @@ app.add_middleware(
 app.include_router(triage.router)
 app.include_router(voice.router)
 app.include_router(prognosis.router)
+app.include_router(alerts.router)
 
 @app.get("/")
 def health_check():

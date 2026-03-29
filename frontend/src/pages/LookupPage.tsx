@@ -7,22 +7,27 @@ import PrognosisCard from '../components/PrognosisCard'
 export default function LookupPage() {
   const { id: paramId } = useParams<{ id: string }>()
   const [id,      setId]      = useState(paramId ?? '')
+  const [pin,     setPin]     = useState('')
   const [loading, setLoading] = useState(false)
   const [result,  setResult]  = useState<PrognosisDetail | null>(null)
   const [error,   setError]   = useState<string | null>(null)
 
-  const lookup = async (lookupId: string) => {
+  const lookup = async (lookupId: string, lookupPin?: string) => {
     if (!lookupId.trim()) return
     setLoading(true); setError(null); setResult(null)
-    try { setResult(await fetchPrognosis(lookupId.trim())) }
+    try { setResult(await fetchPrognosis(lookupId.trim(), lookupPin?.trim() || undefined)) }
     catch (e: any) {
-      setError(e?.response?.status === 404
-        ? 'No case found with that ID. Please check and try again.'
-        : 'Lookup failed. Please try again.')
+      if (e?.response?.status === 404) {
+        setError('No case found with that ID. Please check and try again.')
+      } else if (e?.response?.status === 401) {
+        setError('PIN required or invalid PIN. Please enter the correct PIN for this case.')
+      } else {
+        setError('Lookup failed. Please try again.')
+      }
     } finally { setLoading(false) }
   }
 
-  useEffect(() => { if (paramId) lookup(paramId) }, [paramId])
+  useEffect(() => { if (paramId) lookup(paramId, pin) }, [paramId])
 
   return (
     <div className="page-wrap" style={{ background:'#f4f7fa' }}>
@@ -40,13 +45,27 @@ export default function LookupPage() {
 
         {/* Search bar */}
         <div className="card" style={{ marginBottom:24, padding:'20px 24px' }}>
-          <form onSubmit={e => { e.preventDefault(); lookup(id) }}
+          <form onSubmit={e => { e.preventDefault(); lookup(id, pin) }}
             style={{ display:'flex', gap:10, flexWrap:'wrap' }}>
             <input
               value={id}
               onChange={e => setId(e.target.value)}
               placeholder="Paste prognosis ID — e.g. 3f4a1b2c-..."
               style={{ flex:'1 1 240px', padding:'12px 16px', fontSize:14,
+                border:'1.5px solid var(--navy-12)', borderRadius:'var(--r-sm)',
+                background:'#f8fafc', color:'var(--navy)', minWidth:0,
+                transition:'border-color 0.15s' }}
+              onFocus={e  => (e.target.style.borderColor='var(--teal)')}
+              onBlur={e   => (e.target.style.borderColor='var(--navy-12)')}
+            />
+            <input
+              value={pin}
+              onChange={e => setPin(e.target.value.replace(/\D/g, '').slice(0, 10))}
+              placeholder="PIN (if set for this case)"
+              type="password"
+              inputMode="numeric"
+              maxLength={10}
+              style={{ flex:'1 1 190px', padding:'12px 16px', fontSize:14,
                 border:'1.5px solid var(--navy-12)', borderRadius:'var(--r-sm)',
                 background:'#f8fafc', color:'var(--navy)', minWidth:0,
                 transition:'border-color 0.15s' }}
@@ -79,7 +98,7 @@ export default function LookupPage() {
           </div>
         )}
 
-        {result && <PrognosisCard data={result} />}
+        {result && <PrognosisCard data={result} onCaseUpdated={next => setResult(next)} />}
       </div>
     </div>
   )

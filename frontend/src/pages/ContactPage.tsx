@@ -1,10 +1,17 @@
 import { useState } from 'react'
 
 const INFO = [
-  { icon:'📍', label:'Address',     value:'Kenyatta Avenue, Nairobi, Kenya' },
-  { icon:'📞', label:'Phone',       value:'+254 700 000 000' },
+  { icon:'🗺️', label:'Address',     value:'Kenyatta Avenue, Nairobi, Kenya' },
+  { icon:'☎️', label:'Phone',       value:'+254 700 000 000' },
   { icon:'✉️', label:'Email',       value:'hello@remotriage.app' },
   { icon:'🕐', label:'Available',   value:'24 / 7 — AI always on' },
+]
+
+const SOCIALS = [
+  { icon: '🐦', label: 'Twitter', href: 'https://twitter.com/remotriage' },
+  { icon: '📷', label: 'Instagram', href: 'https://instagram.com/remotriage' },
+  { icon: '🟦', label: 'Facebook', href: 'https://facebook.com/remotriage' },
+  { icon: '🟢', label: 'WhatsApp', href: 'https://wa.me/254700000000' },
 ]
 
 export default function ContactPage() {
@@ -143,23 +150,33 @@ export default function ContactPage() {
               </div>
             </div>
 
-            {/* Toll-free */}
-            <div style={{ background:'var(--navy)', borderRadius:'var(--r-xl)',
-              padding:'24px', display:'flex', alignItems:'center', gap:16 }}>
-              <div style={{ width:48, height:48, borderRadius:12, flexShrink:0,
-                background:'var(--teal-15)', border:'1px solid var(--teal-30)',
-                display:'flex', alignItems:'center', justifyContent:'center', fontSize:22 }}>📞</div>
-              <div>
-                <div style={{ fontSize:10, fontWeight:700, letterSpacing:1,
-                  textTransform:'uppercase', color:'var(--teal)', marginBottom:4 }}>
-                  Toll-free hotline
-                </div>
-                <div className="display" style={{ fontSize:20, color:'var(--white)', marginBottom:2 }}>
-                  0800 000 000
-                </div>
-                <div style={{ fontSize:12, color:'rgba(255,255,255,0.4)', fontWeight:300 }}>
-                  Call · describe symptoms · get SMS reply
-                </div>
+            {/* Socials */}
+            <div className="card" style={{ padding:'20px 22px' }}>
+              <div style={{ fontSize:10, fontWeight:700, letterSpacing:1,
+                textTransform:'uppercase', color:'var(--teal)', marginBottom:12 }}>
+                Follow and chat with us
+              </div>
+              <p style={{ margin:'0 0 14px', color:'var(--navy-60)', fontSize:13, fontWeight:300 }}>
+                You can follow us on Twitter, Instagram, Facebook, or chat on WhatsApp.
+              </p>
+              <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10 }}>
+                {SOCIALS.map(s => (
+                  <a
+                    key={s.label}
+                    href={s.href}
+                    target="_blank"
+                    rel="noreferrer"
+                    style={{
+                      display:'flex', alignItems:'center', gap:10,
+                      border:'1px solid var(--navy-06)', borderRadius:'var(--r-sm)',
+                      padding:'10px 12px', textDecoration:'none', color:'var(--navy)',
+                      background:'#fff'
+                    }}
+                  >
+                    <span style={{ fontSize:16 }}>{s.icon}</span>
+                    <span style={{ fontSize:13, fontWeight:600 }}>{s.label}</span>
+                  </a>
+                ))}
               </div>
             </div>
           </div>
